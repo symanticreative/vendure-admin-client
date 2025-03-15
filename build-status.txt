@@ -1,6 +1,0 @@
-The issues should now be fixed. Please run:
-
-cd /Users/symanticreative/shopeazy-final/plugins/shopeazy/vendure-admin
-npm run build
-
-If there are any additional errors, please share them so we can address them as well.
