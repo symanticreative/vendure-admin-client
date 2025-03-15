@@ -8,7 +8,7 @@ import { Product, CreateProductInput, UpdateProductInput } from '../models/produ
  */
 @Injectable()
 export class ProductService extends BasePaginatedService<Product, string> {
-  constructor(private productRepository: ProductRepository) {
+  constructor(productRepository: ProductRepository) {
     super(productRepository);
   }
 

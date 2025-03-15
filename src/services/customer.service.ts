@@ -8,7 +8,7 @@ import { Customer, CreateCustomerInput, UpdateCustomerInput } from '../models/cu
  */
 @Injectable()
 export class CustomerService extends BasePaginatedService<Customer, string> {
-  constructor(private customerRepository: CustomerRepository) {
+  constructor(customerRepository: CustomerRepository) {
     super(customerRepository);
   }
 

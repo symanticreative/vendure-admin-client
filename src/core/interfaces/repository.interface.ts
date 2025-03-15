@@ -1,8 +1,14 @@
 import {
   FilterCriteria,
-  PaginationOptions,
-  PaginatedResult
+  PaginationOptions as PaginationOptionsModel,
+  PaginatedResult as PaginatedResultModel
 } from '../../models/common/filter.model';
+
+/**
+ * Re-export these types for use in repositories
+ */
+export type PaginationOptions = PaginationOptionsModel;
+export type PaginatedResult<T> = PaginatedResultModel<T>;
 
 /**
  * Base repository interface defining common repository operations

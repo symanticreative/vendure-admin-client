@@ -1,0 +1,34 @@
+# Source code
+src/
+
+# Tests
+tests/
+__tests__/
+*.test.ts
+*.spec.ts
+jest.config.ts
+
+# Development files
+.github/
+.vscode/
+.editorconfig
+.eslintrc
+.eslintignore
+tsconfig.*
+.prettierrc
+.prettierignore
+
+# Temporary directories
+coverage/
+tmp/
+to-be-removed/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Other
+.DS_Store
+node_modules/
+examples/

@@ -7,7 +7,7 @@ import {
   GET_CUSTOMERS, 
   CREATE_CUSTOMER, 
   UPDATE_CUSTOMER 
-} from '../graphql/customer.queries';
+} from '../graphql/customers/customer.queries';
 
 /**
  * Repository for customer operations
@@ -107,7 +107,7 @@ export class CustomerRepository extends BasePaginatedRepository<Customer, string
    * Delete is intentionally overridden to throw an error
    * since this operation might not be supported in the API
    */
-  async delete(id: string): Promise<boolean> {
+  async delete(_id: string): Promise<boolean> {
     throw new Error('Deleting customers is not supported directly');
   }
 }

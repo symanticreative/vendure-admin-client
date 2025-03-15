@@ -6,7 +6,7 @@ import {
   GET_ORDER, 
   GET_ORDERS, 
   UPDATE_ORDER_STATUS 
-} from '../graphql/order.queries';
+} from '../graphql/orders/order.queries';
 
 /**
  * Repository for order operations

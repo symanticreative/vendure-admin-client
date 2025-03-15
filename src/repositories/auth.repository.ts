@@ -2,6 +2,7 @@ import { Injectable } from '../core/di/injectable.decorator';
 import { GraphQLClientService } from '../core/graphql/graphql-client.service';
 import { AuthCredentials, AuthResponse, CurrentUser } from '../models/auth.model';
 import { LOGIN_MUTATION, LOGOUT_MUTATION, GET_CURRENT_USER } from '../graphql/auth.queries';
+import { gql } from '@apollo/client';
 
 /**
  * Repository for authentication operations
@@ -18,7 +19,7 @@ export class AuthRepository {
   async login(credentials: AuthCredentials): Promise<AuthResponse> {
     try {
       const { data } = await this.graphqlClient.getApolloClient().mutate({
-        mutation: this.graphqlClient.getApolloClient().client.createOperationDefinition(LOGIN_MUTATION),
+        mutation: gql(LOGIN_MUTATION),
         variables: { 
           username: credentials.email, 
           password: credentials.password,

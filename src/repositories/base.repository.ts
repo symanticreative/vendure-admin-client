@@ -1,4 +1,3 @@
-import { Injectable } from '../core/di/injectable.decorator';
 import { GraphQLClientService } from '../core/graphql/graphql-client.service';
 import { IRepository, IPaginatedRepository, PaginationOptions, PaginatedResult } from '../core/interfaces/repository.interface';
 
@@ -6,7 +5,6 @@ import { IRepository, IPaginatedRepository, PaginationOptions, PaginatedResult }
  * Base repository implementation for GraphQL operations
  * Implements common repository methods
  */
-@Injectable()
 export abstract class BaseRepository<T, ID> implements IRepository<T, ID> {
   constructor(protected graphqlClient: GraphQLClientService) {}
 
@@ -167,7 +165,6 @@ export abstract class BaseRepository<T, ID> implements IRepository<T, ID> {
  * Base paginated repository implementation
  * Extends base repository with pagination capabilities
  */
-@Injectable()
 export abstract class BasePaginatedRepository<T, ID> 
   extends BaseRepository<T, ID> 
   implements IPaginatedRepository<T, ID> {

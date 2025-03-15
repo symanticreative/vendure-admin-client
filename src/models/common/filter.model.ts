@@ -14,15 +14,6 @@ export type ComparisonOperator =
   | { isNull: boolean };
 
 /**
- * Logical operators for combining filters
- */
-export type LogicalOperator<T = FilterCriteria> = {
-  and?: T[];
-  or?: T[];
-  not?: T;
-};
-
-/**
  * Generic filter value type supporting various filter conditions
  */
 export type FilterValue = 
@@ -35,8 +26,20 @@ export type FilterValue =
 
 /**
  * Generic filter criteria for filtering operations
+ * This is a recursive type that can handle nested conditions
  */
-export type FilterCriteria = LogicalOperator | Record<string, FilterValue | FilterCriteria>;
+export interface FilterCriteria {
+  [key: string]: FilterValue | FilterCriteria | LogicalFilter;
+}
+
+/**
+ * Logical operators for combining filters
+ */
+export interface LogicalFilter {
+  and?: FilterCriteria[];
+  or?: FilterCriteria[];
+  not?: FilterCriteria;
+}
 
 /**
  * Sort direction

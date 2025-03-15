@@ -8,7 +8,7 @@ import {
   CREATE_PRODUCT, 
   UPDATE_PRODUCT, 
   DELETE_PRODUCT 
-} from '../graphql/product.queries';
+} from '../graphql/products/product.queries';
 
 /**
  * Repository for product operations

@@ -1,4 +1,4 @@
-import { Customer } from './customer.model';
+import type { Customer, Address } from './customer.model';
 
 /**
  * Order interface
@@ -37,22 +37,6 @@ export interface OrderLine {
   unitPrice: number;
   quantity: number;
   totalPrice: number;
-  [key: string]: any;
-}
-
-/**
- * Address interface
- */
-export interface Address {
-  fullName: string;
-  company?: string;
-  streetLine1: string;
-  streetLine2?: string;
-  city: string;
-  province?: string;
-  postalCode: string;
-  country: string;
-  phoneNumber?: string;
   [key: string]: any;
 }
 

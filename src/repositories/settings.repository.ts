@@ -1,7 +1,7 @@
 import { Injectable } from '../core/di/injectable.decorator';
 import { GraphQLClientService } from '../core/graphql/graphql-client.service';
 import { AdminSettings, UpdateAdminSettingsInput } from '../models/settings.model';
-import { GET_ADMIN_SETTINGS, UPDATE_ADMIN_SETTINGS } from '../graphql/settings.queries';
+import { GET_ADMIN_SETTINGS, UPDATE_ADMIN_SETTINGS } from '../graphql/settings/settings.queries';
 
 /**
  * Repository for admin settings operations
