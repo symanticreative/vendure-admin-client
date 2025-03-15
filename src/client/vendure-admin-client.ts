@@ -53,7 +53,7 @@ export class VendureAdminClient {
     
     if (!VendureAdminClient.instance && config) {
       VendureAdminClient.instance = new VendureAdminClient(config);
-    } else if (config) {
+    } else if (config && VendureAdminClient.instance) {
       // If config is provided but instance exists, update the instance configuration
       VendureAdminClient.instance.updateConfig(config);
     }
