@@ -1,0 +1,66 @@
+{
+  "name": "vendure-admin",
+  "version": "1.0.0",
+  "description": "A typescript package to interact with a vendure admin api instance to use in creating custom dashboards",
+  "keywords": [
+    "Typescript",
+    "Vendure",
+    "GraphQL",
+    "Admin",
+    "Client"
+  ],
+  "homepage": "https://github.com/symanticreative/vendure-admin-client#readme",
+  "bugs": {
+    "url": "https://github.com/symanticreative/vendure-admin-client/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/symanticreative/vendure-admin-client.git"
+  },
+  "license": "ISC",
+  "author": "Symantic Creative",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src --ext .ts",
+    "lint:fix": "eslint src --ext .ts --fix",
+    "prepublishOnly": "npm run lint && npm run test && npm run build"
+  },
+  "dependencies": {
+    "cross-fetch": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "jest": "^29.7.0",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.2.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.2"
+  },
+  "peerDependencies": {
+    "graphql": "^16.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
