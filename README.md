@@ -1,223 +1,150 @@
-# **Symantic Creative Vendure Admin Client** 🚀  
+# Vendure Admin Client
 
-## **Overview**  
-`@symanticreative/vendure-admin-client` is a **TypeScript GraphQL client** for integrating with the **Vendure Admin API**. It simplifies admin authentication, product management, order handling, and customer interactions—allowing seamless **Next.js and serverless** integrations with Vendure.
+A TypeScript GraphQL client for the Vendure Admin API, implemented with a service-repository pattern and dependency injection.
 
-## **Why Use This?**  
-✅ **TypeScript-first** – Ensures strong typing for API interactions.  
-✅ **GraphQL-powered** – Uses **Apollo Client** for efficient data fetching.  
-✅ **Admin Authentication** – Built-in session handling with token storage.  
-✅ **Modular API Clients** – Import only the parts you need.  
-✅ **Custom Config Support** – API credentials must be set by the consuming project.  
-✅ **Optimized for Next.js & Serverless** – Works seamlessly in modern environments.  
-✅ **Singleton Pattern** – Ensures only one client instance exists throughout your application.
+## Architecture
 
----
+This client follows a clean architecture with clear separation of concerns:
 
-## **🚀 Installation**  
-Install the package using npm or yarn:  
-```sh
+1. **Service Layer**: Business logic and high-level operations
+2. **Repository Layer**: Data access and GraphQL operations
+3. **Client Layer**: The main entry point that integrates everything
+4. **Core**: Shared infrastructure, interfaces, and utilities
+5. **Models**: Data structures and DTOs
+
+## Key Features
+
+- **TypeScript-first** with strong typing throughout
+- **Service-Repository Pattern** for clean separation of concerns
+- **Dependency Injection** for better testability and flexibility
+- **GraphQL-powered** using Apollo Client
+- **Domain-driven Design** with separate modules for different entities
+- **Next.js Integration** with examples for server-side usage
+
+## Usage
+
+### Installation
+
+```bash
 npm install @symanticreative/vendure-admin-client
-# or
-yarn add @symanticreative/vendure-admin-client
 ```
 
----
+### Basic Usage
 
-## **🛠 Configuration**  
-Unlike other API clients, **this package does not assume a fixed API URL or credentials**.  
-Instead, **the consuming project must initialize the client** with its own API details.
+```typescript
+import { 
+  VendureAdminClientFactory, 
+  VendureAdminClient 
+} from '@symanticreative/vendure-admin-client';
 
-### **Initialize the Client**  
-Before making any API calls, you must **initialize the client singleton**:
-```ts
-import { VendureAdminClient } from '@symanticreative/vendure-admin-client';
-
-// Initialize the singleton client
-VendureAdminClient.getInstance({
-  apiUrl: process.env.VENDURE_ADMIN_API_URL,  // Your Vendure Admin API URL
-  authToken: process.env.VENDURE_ADMIN_AUTH_TOKEN,  // Optional: Authentication token for API requests
+// Create a client instance
+const client = VendureAdminClientFactory.createClient({
+  apiUrl: 'https://your-vendure-instance.com/admin-api',
 });
-```
-- **API calls will fail unless the client is initialized first.**
-- **No `.env` files are used inside the package**—configurations must come from the importing project.
 
-### **Next.js Integration**
-For **Next.js projects**, set up environment variables and initialize the client:
+// Login using the auth service
+await client.auth.login({
+  email: 'admin@example.com',
+  password: 'password',
+});
 
-1. Create a `.env.local` file in your project root:
-```
-VENDURE_ADMIN_API_URL=https://your-vendure-instance.com/admin-api
-```
+// Get products using the product service
+const products = await client.products.getPaginated({ take: 10 });
 
-2. In your `lib` directory, create a vendure-client initialization file:
+// Use the order service
+const orders = await client.orders.getPaginated({ take: 5 });
 
-```ts
-// lib/vendure-client.ts
-import { VendureAdminClient } from '@symanticreative/vendure-admin-client';
+// Use the customer service
+const customers = await client.customers.getPaginated({ take: 10 });
 
-export function getVendureClient() {
-  // Only initialize on server side
-  if (typeof window === 'undefined') {
-    return VendureAdminClient.getInstance({
-      apiUrl: process.env.VENDURE_ADMIN_API_URL!,
-    });
-  }
-  
-  return VendureAdminClient.getInstance();
-}
+// Use the settings service
+const settings = await client.settings.getSettings();
 ```
 
-3. Initialize the client in your app's entry point:
+## Architecture Details
 
-```ts
-// app/layout.tsx or app/_lib/init.ts
+### Service Layer
+
+Services handle business logic and provide a high-level API for common operations:
+
+- `AuthService`: Authentication operations
+- `ProductService`: Product management
+- `OrderService`: Order processing
+- `CustomerService`: Customer management
+- `SettingsService`: Admin settings
+
+### Repository Layer
+
+Repositories handle data access and GraphQL operations:
+
+- `AuthRepository`: Authentication operations
+- `ProductRepository`: Product data access
+- `OrderRepository`: Order data access
+- `CustomerRepository`: Customer data access
+- `SettingsRepository`: Settings data access
+
+### Dependency Injection
+
+The client uses a simple dependency injection container for managing dependencies:
+
+```typescript
+const container = Container.getInstance();
+container.register('ProductService', new ProductService(productRepository));
+const productService = container.get<ProductService>('ProductService');
+```
+
+### GraphQL Client
+
+A GraphQL client service handles all GraphQL operations:
+
+```typescript
+const graphqlClient = new GraphQLClientService(config);
+const result = await graphqlClient.query(GET_PRODUCTS, { options });
+```
+
+## Next.js Integration
+
+For Next.js applications, the client can be initialized in the app's entry point:
+
+```typescript
+// app/layout.tsx
 import { getVendureClient } from '@/lib/vendure-client';
 
-// Initialize on server side
+// Initialize the client on the server side
 if (typeof window === 'undefined') {
   getVendureClient();
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html>
       <body>{children}</body>
     </html>
   );
 }
 ```
 
-4. For server actions, you can authenticate within the action:
+And then used in server actions:
 
-```ts
-// app/actions/admin-actions.ts
+```typescript
+// actions.ts
 'use server'
 
-import { loginAdmin, getProducts } from '@symanticreative/vendure-admin-client';
 import { getVendureClient } from '@/lib/vendure-client';
 
-export async function fetchProducts() {
-  // Ensure client is initialized
-  getVendureClient();
-  
-  // Authenticate (consider using a more secure approach for credentials in production)
-  await loginAdmin({ 
-    email: process.env.VENDURE_ADMIN_EMAIL!,
-    password: process.env.VENDURE_ADMIN_PASSWORD!
-  });
-  
-  // Fetch data
-  return getProducts({ take: 10 });
+export async function getDashboardData() {
+  const client = getVendureClient();
+  return client.products.getPaginated({ take: 5 });
 }
 ```
 
----
+## Examples
 
-## **🔧 API Usage**  
-Once configured, you can **import and use API functions**.
+The package includes examples:
 
-### **🔑 Authentication**
-Admin login/logout management:
-```ts
-import { loginAdmin, logoutAdmin } from '@symanticreative/vendure-admin-client';
+- `examples/basic-usage.ts`: Simple usage example
+- `examples/nextjs-example/`: Complete Next.js application example
 
-const token = await loginAdmin({ email: 'admin@example.com', password: 'securepass' });
-await logoutAdmin();
-```
+## License
 
-### **📦 Products API**
-Retrieve and update products:
-```ts
-import { getProducts, updateProduct } from '@symanticreative/vendure-admin-client';
-
-const products = await getProducts({ take: 10, skip: 0 });
-await updateProduct({ id: '123', name: 'Updated Product Name' });
-```
-
-### **🛒 Orders API**
-Manage customer orders:
-```ts
-import { getOrders, updateOrderStatus } from '@symanticreative/vendure-admin-client';
-
-const orders = await getOrders({ take: 5 });
-await updateOrderStatus({ orderId: '456', status: 'Shipped' });
-```
-
-### **👥 Customers API**
-Retrieve and create customers:
-```ts
-import { getCustomers, createCustomer } from '@symanticreative/vendure-admin-client';
-
-const customers = await getCustomers({ take: 20 });
-
-await createCustomer({
-  email: 'newuser@example.com',
-  firstName: 'John',
-  lastName: 'Doe',
-});
-```
-
-### **⚙️ Settings API**
-Fetch and modify admin settings:
-```ts
-import { getAdminSettings, updateAdminSettings } from '@symanticreative/vendure-admin-client';
-
-const settings = await getAdminSettings();
-await updateAdminSettings({ currency: 'ZAR', defaultLanguage: 'en' });
-```
-
-### **🔄 Custom Queries**
-Execute custom GraphQL operations:
-```ts
-import { executeCustomOperation } from '@symanticreative/vendure-admin-client';
-
-const customQuery = `
-  query GetSpecialProducts {
-    products(options: { filter: { custom: true } }) {
-      items {
-        id
-        name
-        customFields {
-          specialFeature
-        }
-      }
-    }
-  }
-`;
-
-const result = await executeCustomOperation(customQuery);
-```
-
----
-
-## **🔬 Testing**
-This package includes **unit and integration tests** using Jest. To run tests:
-```sh
-npm test
-```
-
----
-
-## **📄 Example Next.js Integration**
-For a **fully working example**, check out the **Next.js example** included in this package:
-```sh
-# Basic example
-cd examples/nextjs-example
-
-# Singleton pattern example (recommended)
-cd examples/nextjs-singleton-example
-```
-These provide implementation examples for different integration approaches.
-
----
-
-## **🔗 Resources**
-📖 **Vendure Documentation**: [https://www.vendure.io/docs](https://www.vendure.io/docs)  
-💬 **Vendure Community**: [https://www.vendure.io/community](https://www.vendure.io/community)  
-🔧 **Vendure Admin API Reference**: [https://docs.vendure.io/reference/graphql-api/admin](https://docs.vendure.io/reference/graphql-api/admin)  
-
----
-
-## **📜 License**
-This package is **open-source**, built on Vendure, and licensed under the **MIT License**.
+MIT License
