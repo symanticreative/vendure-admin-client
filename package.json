@@ -1,6 +1,6 @@
 {
   "name": "@symanticreative/vendure-admin-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A TypeScript GraphQL client for Vendure Admin API to create custom dashboards",
   "keywords": [
     "TypeScript",
@@ -30,13 +30,12 @@
   "files": [
     "dist"
   ],
-"scripts": {
-  "clean": "rm -rf dist",
-  "build": "npm run clean && tsc && tsc --outDir dist/cjs --module CommonJS",
-  "test": "jest --passWithNoTests",
-  "prepublishOnly": "npm run lint && npm run test || echo 'Tests failed, skipping publish' && npm run build"
-},
-
+  "scripts": {
+    "clean": "rm -rf dist",
+    "build": "npm run clean && tsc && tsc --outDir dist/cjs --module CommonJS",
+    "test": "jest --passWithNoTests",
+    "prepublishOnly": "npm run lint && npm run test || echo 'Tests failed, skipping publish' && npm run build"
+  },
   "dependencies": {
     "@apollo/client": "^3.13.4",
     "cross-fetch": "^4.1.0",
