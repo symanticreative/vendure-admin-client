@@ -12,39 +12,18 @@ export interface AuthCredentials {
 }
 
 /**
- * Global authentication state
- */
-let globalClient: VendureAdminClient | null = null;
-
-/**
- * Set the global admin credentials
- * 
- * @param config - Configuration containing API URL and optional auth token
- */
-export function setAdminCredentials(config: {
-  apiUrl: string;
-  authToken?: string;
-  refreshToken?: string;
-}): void {
-  globalClient = new VendureAdminClient({
-    apiUrl: config.apiUrl,
-    authToken: config.authToken,
-    refreshToken: config.refreshToken
-  });
-}
-
-/**
  * Get the global client instance
- * @returns The global VendureAdminClient instance
- * @throws Error if credentials have not been set
+ * @returns The VendureAdminClient singleton instance
+ * @throws Error if client has not been initialized
  */
 export function getClient(): VendureAdminClient {
-  if (!globalClient) {
+  try {
+    return VendureAdminClient.getInstance();
+  } catch (error) {
     throw new Error(
-      'Admin credentials not set. Call setAdminCredentials() before making API calls.'
+      'Vendure Admin Client not initialized. Initialize VendureAdminClient.getInstance(config) before making API calls.'
     );
   }
-  return globalClient;
 }
 
 /**
@@ -83,4 +62,25 @@ export async function getCurrentUser(): Promise<CurrentUser> {
   const client = getClient();
   const result = await client.query<{ me: CurrentUser }>(GET_CURRENT_USER);
   return result.me;
+}
+
+/**
+ * Execute a custom GraphQL operation using the admin client
+ * This allows for extending the client with custom queries and mutations
+ * 
+ * @param operation - Custom GraphQL operation (query or mutation)
+ * @param variables - Variables for the GraphQL operation
+ * @param options - Additional options for the operation
+ * @returns Promise resolving to the operation result
+ */
+export async function executeCustomOperation<T = any>(
+  operation: string | any,
+  variables?: Record<string, any>,
+  options?: { 
+    type?: 'query' | 'mutation',
+    fetchPolicy?: string
+  }
+): Promise<T> {
+  const client = getClient();
+  return client.executeCustomOperation<T>(operation, variables, options);
 }

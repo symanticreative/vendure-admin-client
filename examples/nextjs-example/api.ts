@@ -1,5 +1,5 @@
 import { 
-  setAdminCredentials, 
+  VendureAdminClient,
   loginAdmin, 
   getProducts, 
   getOrders, 
@@ -7,19 +7,28 @@ import {
 } from '@symanticreative/vendure-admin-client';
 
 // This would typically be in a Next.js api route or server component
-export async function initializeVendureClient() {
-  // Initialize with environment variables
-  setAdminCredentials({
-    apiUrl: process.env.VENDURE_ADMIN_API_URL || 'https://demo.vendure.io/admin-api',
-  });
+export function getVendureClient() {
+  if (typeof window === 'undefined') {
+    // Initialize with environment variables
+    return VendureAdminClient.getInstance({
+      apiUrl: process.env.VENDURE_ADMIN_API_URL || 'https://demo.vendure.io/admin-api',
+    });
+  }
+  
+  return VendureAdminClient.getInstance();
 }
 
 export async function authenticateAdmin(email: string, password: string) {
+  // Make sure client is initialized
+  getVendureClient();
   return loginAdmin({ email, password });
 }
 
 export async function fetchDashboardData() {
   try {
+    // Make sure client is initialized
+    getVendureClient();
+    
     // Fetch data for dashboard
     const [products, orders, customers] = await Promise.all([
       getProducts({ take: 5 }),

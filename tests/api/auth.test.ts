@@ -1,4 +1,4 @@
-import { setAdminCredentials, loginAdmin, logoutAdmin, getCurrentUser } from '../../src/api/auth';
+import { loginAdmin, logoutAdmin, getCurrentUser } from '../../src/api/auth';
 import { VendureAdminClient } from '../../src/client/vendure-admin-client';
 
 // Mock the VendureAdminClient class
@@ -10,12 +10,13 @@ describe('Auth API', () => {
     email: 'admin@example.com',
     password: 'admin123'
   };
-
+  
+  let mockClient: any;
+  
   beforeEach(() => {
     jest.clearAllMocks();
     
-    // Set up mock for VendureAdminClient
-    (VendureAdminClient as jest.Mock).mockImplementation(() => ({
+    mockClient = {
       login: jest.fn().mockResolvedValue({
         token: 'mock-token',
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
@@ -27,53 +28,46 @@ describe('Auth API', () => {
           identifier: 'admin@example.com'
         }
       })
-    }));
+    };
+    
+    // Set up mock for VendureAdminClient singleton
+    (VendureAdminClient.getInstance as jest.Mock).mockReturnValue(mockClient);
   });
 
-  it('should set admin credentials and create client instance', () => {
-    setAdminCredentials({ apiUrl: mockApiUrl });
-    
-    expect(VendureAdminClient).toHaveBeenCalledWith({
-      apiUrl: mockApiUrl
-    });
-  });
-
-  it('should login successfully', async () => {
-    setAdminCredentials({ apiUrl: mockApiUrl });
-    
+  it('should initialize client instance and login successfully', async () => {
     const result = await loginAdmin(mockCredentials);
     
     expect(result.token).toBe('mock-token');
     expect(result.expires).toBeDefined();
+    expect(mockClient.login).toHaveBeenCalledWith(
+      mockCredentials.email,
+      mockCredentials.password,
+      false
+    );
   });
 
   it('should logout successfully', async () => {
-    setAdminCredentials({ apiUrl: mockApiUrl });
-    
     await logoutAdmin();
     
-    const mockClient = (VendureAdminClient as jest.Mock).mock.results[0].value;
     expect(mockClient.logout).toHaveBeenCalled();
   });
 
   it('should get current user', async () => {
-    setAdminCredentials({ apiUrl: mockApiUrl });
-    
     const user = await getCurrentUser();
     
     expect(user.id).toBe('user-1');
     expect(user.identifier).toBe('admin@example.com');
-    
-    const mockClient = (VendureAdminClient as jest.Mock).mock.results[0].value;
     expect(mockClient.query).toHaveBeenCalled();
   });
 
-  it('should throw error when credentials not set', async () => {
-    // Reset global client
-    (global as any).globalClient = null;
+  it('should throw error when client not initialized', async () => {
+    // Make getInstance throw an error
+    (VendureAdminClient.getInstance as jest.Mock).mockImplementationOnce(() => {
+      throw new Error('Vendure Admin Client not initialized');
+    });
     
     await expect(loginAdmin(mockCredentials)).rejects.toThrow(
-      'Admin credentials not set'
+      'Vendure Admin Client not initialized'
     );
   });
 });

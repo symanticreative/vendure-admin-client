@@ -1,12 +1,12 @@
-// Core client
+// Core client - This is the main way to initialize the singleton
 export { VendureAdminClient } from './client/vendure-admin-client';
 
 // Authentication
 export { 
-  setAdminCredentials,
   loginAdmin,
   logoutAdmin,
-  getCurrentUser
+  getCurrentUser,
+  executeCustomOperation // For custom queries
 } from './api/auth';
 
 // Products API

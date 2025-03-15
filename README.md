@@ -10,6 +10,7 @@
 ✅ **Modular API Clients** – Import only the parts you need.  
 ✅ **Custom Config Support** – API credentials must be set by the consuming project.  
 ✅ **Optimized for Next.js & Serverless** – Works seamlessly in modern environments.  
+✅ **Singleton Pattern** – Ensures only one client instance exists throughout your application.
 
 ---
 
@@ -27,21 +28,22 @@ yarn add @symanticreative/vendure-admin-client
 Unlike other API clients, **this package does not assume a fixed API URL or credentials**.  
 Instead, **the consuming project must initialize the client** with its own API details.
 
-### **Set Credentials**  
-Before making any API calls, you must **set admin credentials**:
+### **Initialize the Client**  
+Before making any API calls, you must **initialize the client singleton**:
 ```ts
-import { setAdminCredentials } from '@symanticreative/vendure-admin-client';
+import { VendureAdminClient } from '@symanticreative/vendure-admin-client';
 
-setAdminCredentials({
+// Initialize the singleton client
+VendureAdminClient.getInstance({
   apiUrl: process.env.VENDURE_ADMIN_API_URL,  // Your Vendure Admin API URL
-  authToken: process.env.VENDURE_ADMIN_AUTH_TOKEN,  // Authentication token for API requests
+  authToken: process.env.VENDURE_ADMIN_AUTH_TOKEN,  // Optional: Authentication token for API requests
 });
 ```
-- **API calls will fail unless credentials are set first.**
+- **API calls will fail unless the client is initialized first.**
 - **No `.env` files are used inside the package**—configurations must come from the importing project.
 
-### **Next.js 15 Integration**
-For **Next.js 15 projects**, set up environment variables and initialize the client:
+### **Next.js Integration**
+For **Next.js projects**, set up environment variables and initialize the client:
 
 1. Create a `.env.local` file in your project root:
 ```
@@ -52,13 +54,17 @@ VENDURE_ADMIN_API_URL=https://your-vendure-instance.com/admin-api
 
 ```ts
 // lib/vendure-client.ts
-import { setAdminCredentials } from '@symanticreative/vendure-admin-client';
+import { VendureAdminClient } from '@symanticreative/vendure-admin-client';
 
-export function initVendureClient() {
-  // Only set credentials once
-  setAdminCredentials({
-    apiUrl: process.env.VENDURE_ADMIN_API_URL!,
-  });
+export function getVendureClient() {
+  // Only initialize on server side
+  if (typeof window === 'undefined') {
+    return VendureAdminClient.getInstance({
+      apiUrl: process.env.VENDURE_ADMIN_API_URL!,
+    });
+  }
+  
+  return VendureAdminClient.getInstance();
 }
 ```
 
@@ -66,11 +72,11 @@ export function initVendureClient() {
 
 ```ts
 // app/layout.tsx or app/_lib/init.ts
-import { initVendureClient } from '@/lib/vendure-client';
+import { getVendureClient } from '@/lib/vendure-client';
 
 // Initialize on server side
 if (typeof window === 'undefined') {
-  initVendureClient();
+  getVendureClient();
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -89,11 +95,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 'use server'
 
 import { loginAdmin, getProducts } from '@symanticreative/vendure-admin-client';
-import { initVendureClient } from '@/lib/vendure-client';
+import { getVendureClient } from '@/lib/vendure-client';
 
 export async function fetchProducts() {
   // Ensure client is initialized
-  initVendureClient();
+  getVendureClient();
   
   // Authenticate (consider using a more secure approach for credentials in production)
   await loginAdmin({ 
@@ -161,6 +167,28 @@ const settings = await getAdminSettings();
 await updateAdminSettings({ currency: 'ZAR', defaultLanguage: 'en' });
 ```
 
+### **🔄 Custom Queries**
+Execute custom GraphQL operations:
+```ts
+import { executeCustomOperation } from '@symanticreative/vendure-admin-client';
+
+const customQuery = `
+  query GetSpecialProducts {
+    products(options: { filter: { custom: true } }) {
+      items {
+        id
+        name
+        customFields {
+          specialFeature
+        }
+      }
+    }
+  }
+`;
+
+const result = await executeCustomOperation(customQuery);
+```
+
 ---
 
 ## **🔬 Testing**
@@ -172,13 +200,15 @@ npm test
 ---
 
 ## **📄 Example Next.js Integration**
-For a **fully working example**, check out the **Next.js starter** included in this package:
+For a **fully working example**, check out the **Next.js example** included in this package:
 ```sh
-cd examples/nextjs-starter
-npm install
-npm run dev
+# Basic example
+cd examples/nextjs-example
+
+# Singleton pattern example (recommended)
+cd examples/nextjs-singleton-example
 ```
-This provides a basic UI to test API interactions.
+These provide implementation examples for different integration approaches.
 
 ---
 

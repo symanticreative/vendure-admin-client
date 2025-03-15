@@ -1,5 +1,5 @@
 import { 
-  setAdminCredentials, 
+  VendureAdminClient,
   loginAdmin, 
   logoutAdmin,
   getProducts,
@@ -14,7 +14,7 @@ async function main() {
   try {
     // Set up the client with API URL
     console.log('Initializing client...');
-    setAdminCredentials({
+    VendureAdminClient.getInstance({
       apiUrl: 'https://example-vendure.com/admin-api',
     });
 
