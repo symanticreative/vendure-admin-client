@@ -1,9 +1,9 @@
 {
-  "name": "vendure-admin",
+  "name": "@symanticreative/vendure-admin-client",
   "version": "1.0.0",
-  "description": "A typescript package to interact with a vendure admin api instance to use in creating custom dashboards",
+  "description": "A TypeScript GraphQL client for Vendure Admin API to create custom dashboards",
   "keywords": [
-    "Typescript",
+    "TypeScript",
     "Vendure",
     "GraphQL",
     "Admin",
@@ -17,7 +17,7 @@
     "type": "git",
     "url": "https://github.com/symanticreative/vendure-admin-client.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "Symantic Creative",
   "type": "module",
   "main": "dist/index.js",
@@ -41,7 +41,10 @@
     "prepublishOnly": "npm run lint && npm run test && npm run build"
   },
   "dependencies": {
-    "cross-fetch": "^4.0.0"
+    "@apollo/client": "^3.9.9",
+    "cross-fetch": "^4.0.0",
+    "graphql": "^16.8.1",
+    "jwt-decode": "^4.0.0"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
@@ -52,13 +55,11 @@
     "eslint-config-prettier": "^10.1.1",
     "eslint-plugin-prettier": "^5.2.3",
     "jest": "^29.7.0",
+    "mock-apollo-client": "^1.2.1",
     "prettier": "^3.5.3",
     "ts-jest": "^29.2.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2"
-  },
-  "peerDependencies": {
-    "graphql": "^16.0.0"
   },
   "engines": {
     "node": ">=18.0.0"

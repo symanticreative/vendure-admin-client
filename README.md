@@ -40,6 +40,72 @@ setAdminCredentials({
 - **API calls will fail unless credentials are set first.**
 - **No `.env` files are used inside the package**—configurations must come from the importing project.
 
+### **Next.js 15 Integration**
+For **Next.js 15 projects**, set up environment variables and initialize the client:
+
+1. Create a `.env.local` file in your project root:
+```
+VENDURE_ADMIN_API_URL=https://your-vendure-instance.com/admin-api
+```
+
+2. In your `lib` directory, create a vendure-client initialization file:
+
+```ts
+// lib/vendure-client.ts
+import { setAdminCredentials } from '@symanticreative/vendure-admin-client';
+
+export function initVendureClient() {
+  // Only set credentials once
+  setAdminCredentials({
+    apiUrl: process.env.VENDURE_ADMIN_API_URL!,
+  });
+}
+```
+
+3. Initialize the client in your app's entry point:
+
+```ts
+// app/layout.tsx or app/_lib/init.ts
+import { initVendureClient } from '@/lib/vendure-client';
+
+// Initialize on server side
+if (typeof window === 'undefined') {
+  initVendureClient();
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
+```
+
+4. For server actions, you can authenticate within the action:
+
+```ts
+// app/actions/admin-actions.ts
+'use server'
+
+import { loginAdmin, getProducts } from '@symanticreative/vendure-admin-client';
+import { initVendureClient } from '@/lib/vendure-client';
+
+export async function fetchProducts() {
+  // Ensure client is initialized
+  initVendureClient();
+  
+  // Authenticate (consider using a more secure approach for credentials in production)
+  await loginAdmin({ 
+    email: process.env.VENDURE_ADMIN_EMAIL!,
+    password: process.env.VENDURE_ADMIN_PASSWORD!
+  });
+  
+  // Fetch data
+  return getProducts({ take: 10 });
+}
+```
+
 ---
 
 ## **🔧 API Usage**  
@@ -125,7 +191,3 @@ This provides a basic UI to test API interactions.
 
 ## **📜 License**
 This package is **open-source**, built on Vendure, and licensed under the **MIT License**.
-
----
-
-This README now **fully aligns with the client approach**, using **`setAdminCredentials`** instead of a generic config setter. Let me know if you want any **more refinements**! 🚀
