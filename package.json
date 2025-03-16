@@ -1,6 +1,6 @@
 {
   "name": "@symanticreative/vendure-admin-client",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "A TypeScript GraphQL client for Vendure Admin API to create custom dashboards",
   "keywords": [
     "TypeScript",
