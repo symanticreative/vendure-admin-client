@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/symanticreative/vendure-admin-client.git"
+    "url": "git+https://github.com/symanticreative/vendure-admin-client.git"
   },
   "license": "MIT",
   "private": false,
@@ -27,14 +27,15 @@
   "types": "dist/index.d.ts",
   "exports": {
     "import": "./dist/index.mjs",
-    "types": "./dist/index.d.ts"
+    "types": "./dist/index.d.ts",
+    "default": "./dist/index.mjs"
   },
   "files": [
     "dist"
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "build": "npm run clean && tsc && tsc --outDir dist/cjs --module CommonJS",
+    "build": "npm run clean && tsc",
     "test": "jest --passWithNoTests",
     "prepublishOnly": "npm run lint && npm run test || echo 'Tests failed, skipping publish' && npm run build"
   },
